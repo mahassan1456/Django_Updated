@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.utils import timezone
 import datetime
+from django.conf import settings
 
 
 # Create your models here.
@@ -11,6 +12,11 @@ import datetime
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('Date Published')
+    user_p = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE, null=True
+    )
+    
     
 
 
