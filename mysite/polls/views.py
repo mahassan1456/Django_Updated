@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import login,authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 
@@ -117,3 +118,15 @@ def sign_up(request):
         else:
             return render(request, 'polls/sign_up.html', context= {'error_message': "Please enter the same unique password"} )
     return render(request, 'polls/sign_up.html' )
+
+
+@login_required
+def add_question(request):
+    if request.method == 'POST':
+        question = request.POST.get('question','')
+        if question:
+            request.user.question_set.create(question_text=question, pub_date=timezone.now())
+            request.user.save()
+            return HttpResponseRedirect(reverse('polls:index'))
+
+    return render(request, 'polls/add_question.html')
