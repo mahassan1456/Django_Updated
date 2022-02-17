@@ -15,7 +15,7 @@ from django.utils import timezone
 @login_required
 def index(request):
     
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    latest_question_list = Question.objects.order_by('-pub_date')
     template = loader.get_template('polls/index.html')
     context = {
         'latest_question_list': latest_question_list
@@ -127,6 +127,11 @@ def add_question(request):
         if question:
             request.user.question_set.create(question_text=question, pub_date=timezone.now())
             request.user.save()
+            choices = request.POST.get('choices','')
+            choices_list = [x.strip() for x in choices.split('\n')]
+            for x in choices_list:
+                request.user.question_set.get(question_text=question).choice_set.create(choice_text=x, votes=0)
+                request.user.save()
             return HttpResponseRedirect(reverse('polls:index'))
 
     return render(request, 'polls/add_question.html')

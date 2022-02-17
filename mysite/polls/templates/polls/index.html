@@ -1,13 +1,23 @@
 {% extends 'polls/base.html' %}
 
 {% block content %}
-    <a href="{% url 'polls:logout_user'  %}"> Log_Out User</a>
     {% if latest_question_list %}
+    <h2>Questions by other Users</h2>
     <ul>
     {% for question in latest_question_list %}
+        {% if question.user_p.id != request.user.id %}
         <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+        {% endif %}
     {% endfor %}
     </ul>
+    <h2>Questions by You!</h2>
+    <ul>
+        {% for question in latest_question_list %}
+            {% if question.user_p.id == request.user.id %}
+            <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
     {% else %}
     <p>No polls are available.</p>
     {% endif %}
