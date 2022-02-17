@@ -17,6 +17,7 @@
         {% if request.user.is_authenticated %}
         <a class="nav-link" href="{% url 'polls:logout_user'  %}">Log Out</a>
         <a class="nav-link" href="{% url 'polls:add_question'  %}">Add Question</a>
+        <a class="nav-link" href="{% url 'polls:success'  %}">Profile</a>
         {% else %}
         <a class="nav-link" href="{% url 'polls:sign_up'  %}">Register</a>
         <a class="nav-link" href="{% url 'polls:login_user'  %}">Log In</a>

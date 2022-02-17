@@ -18,7 +18,8 @@ def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')
     template = loader.get_template('polls/index.html')
     context = {
-        'latest_question_list': latest_question_list
+        'latest_question_list': latest_question_list,
+        'Users' : User.objects.all()
     }
 
     return HttpResponse(template.render(context, request))
@@ -90,6 +91,8 @@ def results(request, question_id):
 #     model = Question
 #     template_name = 'polls/results.html'
 def vote(request,question_id):
+    if request.POST.get('edit','') == 'Edit':
+        return HttpResponseRedirect(reverse('polls:edit', args=(question_id,))) 
     question = get_object_or_404(Question, pk=question_id)
     try:
         choice = question.choice_set.get(pk=request.POST['choice'])
@@ -104,10 +107,12 @@ def vote(request,question_id):
         choice.save()
         choice.votes += 1
         choice.save()
+        
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 def sign_up(request):
     if request.method == 'POST':
+        print("t----", request.POST.get('t', "non existant"))
         first = request.POST['first']
         last = request.POST['last']
         email = request.POST['email']
@@ -125,6 +130,7 @@ def sign_up(request):
 @login_required
 def add_question(request):
     if request.method == 'POST':
+        
         question = request.POST.get('question','')
         if question:
             request.user.question_set.create(question_text=question, pub_date=timezone.now())
@@ -137,3 +143,23 @@ def add_question(request):
             return HttpResponseRedirect(reverse('polls:index'))
 
     return render(request, 'polls/add_question.html')
+
+@login_required
+def edit(request, question_id):
+    question = request.user.question_set.get(pk=question_id)
+    if request.method == 'POST':
+        # question.choice_set.all().delete()
+        # question.question_text = request.POST.get('question')
+        # question.save()
+        # choices = request.POST.get('choices','')
+        # choices_list = [x.strip() for x in choices.split('\n')]
+        question.deleteChoices(request.POST.get('question'), request.POST.get('choices',''))
+        # for x in choices_list:
+        #     question.choice_set.create(choice_text=x, votes=0)
+        #     question.save()
+        return HttpResponseRedirect(reverse('polls:index'))
+
+
+
+    
+    return render(request, 'polls/edit.html', {'question':question})

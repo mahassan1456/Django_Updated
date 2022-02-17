@@ -29,8 +29,12 @@
             <li>Answered {{ choice.choice_text }} for {{ choice.question.question_text }}</li> 
             <h5>Other Users that answered Similar</h5>
             <ol>
-                {% for user in choice.users.all %}
-                <li>{{ user.username }} </li>
+                {% for user in Users %}
+                 {% for choiceN in user.choice_set.all %}
+                 {% if choiceN.question.id == choice.question.id and request.user.id != user.id %}
+                <li>{{ user.username }} Answered {{ choiceN.choice_text }} </li>
+                 {% endif %}
+                 {% endfor %}
                 {% endfor %}
             </ol>
         {% endfor %}

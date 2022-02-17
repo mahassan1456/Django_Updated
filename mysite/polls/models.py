@@ -20,6 +20,18 @@ class Question(models.Model):
 
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+    
+    def deleteChoices(self,new_question_text,choice_list):
+        self.choice_set.all().delete()
+        self.save()
+        self.question_text = new_question_text
+        self.save()
+        choice_list = [x.strip() for x in choice_list.split('\n')]
+        for x in choice_list:
+            if x:
+                self.choice_set.create(choice_text=x, votes=0)
+                self.save()
+
 
 
     def __str__(self):
