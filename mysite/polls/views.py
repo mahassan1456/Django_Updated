@@ -100,6 +100,8 @@ def vote(request,question_id):
         }
         return render(request, 'polls/details.html', context)
     else:
+        choice.users.add(request.user)
+        choice.save()
         choice.votes += 1
         choice.save()
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
