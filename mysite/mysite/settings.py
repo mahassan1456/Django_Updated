@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+from mysite.secrets import DB_PASS, DB_USER
+
 
 
 
@@ -89,8 +91,8 @@ DATABASES = {
         'ENGINE' : 'django.db.backends.mysql',
         'NAME': 'Dj2',
         'HOST': '127.0.0.1',
-        'USER': 'root',
-        'PASSWORD': 'Iverson01',
+        'USER': DB_USER,
+        'PASSWORD': DB_PASS,
         'PORT': '3306'
     }
 }
