@@ -6,5 +6,15 @@
 
 <h2>{{ request.user }} </h2>
 
+<form action="" method="post">
+    {% csrf_token %}
+    <table border="1">
+        {{ form }}
+    </table>
+    <button type="submit"> Update Profile </button>
+
+
+</form>
+
 
 {% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'polls/base.html' %} 
+
+{% block content %} 
+
+<h2><strong>Biography</strong></h2>
+<p>
+ {{request.user.profile.bio}}
+</p>
+<h2><strong>Location</strong></h2>
+<p>
+ {{ request.user.profile.location }}
+</p>
+<h2><strong>Birthdate</strong></h2>
+<p>
+ {{ request.user.profile.birthdate }}
+</p>
+{% endblock %}

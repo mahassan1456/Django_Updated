@@ -9,6 +9,9 @@ from django.contrib.auth import login,authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from polls.forms import UserSignUp, AdditionInfo
+from django.contrib import messages
+import datetime
 
 
 
@@ -26,9 +29,25 @@ def index(request):
 
 @login_required
 def success(request):
+    if request.method == 'POST':
+        form = AdditionInfo(request.POST)
+        if form.is_valid():
+            request.user.profile.bio = form.cleaned_data.get('bio')
+            request.user.profile.location = form.cleaned_data.get('location')
+            request.user.profile.birthdate = form.cleaned_data.get('birthdate')
+            
+            request.user.save()
+            return HttpResponseRedirect(reverse('polls:index'))
     print(request.user)
-    return render(request, 'polls/success.html')
+    form = AdditionInfo(initial={'bio': request.user.profile.bio, 'location':request.user.profile.location,'birthdate':request.user.profile.birthdate})
+    return render(request, 'polls/success.html', {'form': form})
 
+@login_required
+def view_profile(request):
+    if request.user.profile:
+        return render(request, 'polls/view_profile.html')
+    
+    return HttpResponseRedirect(reverse('polls:success'))
 
 def login_user(request):
     if request.method == 'POST':
@@ -163,3 +182,17 @@ def edit(request, question_id):
 
     
     return render(request, 'polls/edit.html', {'question':question})
+
+# def test(request):
+#     if request.method == 'POST':
+#         form = UserSignUp(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             print(form.cleaned_data.get('extra',''))
+#             messages.success(request, "You have successfully signed up")
+#         else:
+#             messages.error(request, "Username already exists")
+
+#     else:
+#         form = UserSignUp()
+#     return render(request, 'polls/test.html', {'form': form })
