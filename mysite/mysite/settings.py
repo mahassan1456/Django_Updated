@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
-from mysite.secrets import DB_PASS, DB_USER
+from mysite.secrets import DB_PASS, DB_USER, DB_NAME
 
 
 
@@ -90,7 +90,7 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': BASE_DIR / 'db.sqlite3'
         'ENGINE' : 'django.db.backends.mysql',
-        'NAME': 'Dj2',
+        'NAME': DB_NAME,
         'HOST': '127.0.0.1',
         'USER': DB_USER,
         'PASSWORD': DB_PASS,

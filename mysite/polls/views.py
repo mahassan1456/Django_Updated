@@ -123,7 +123,15 @@ def results(request, question_id):
 
 @login_required
 def add_friend(request, user_id):
-    
+    usee = User.objects.get(pk=user_id)
+    print(usee)
+    friender = User.objects.get(pk=user_id)
+    print(friender)
+    print('dddd',friender.user)
+    friender.user.requests.add(request.user)
+    friender.save()
+    request.user.user.sent_requests.add(friender)
+    request.user.save()
     # request.user.user.send_request(user_id)
 
     return HttpResponseRedirect(reverse('polls:index'))
