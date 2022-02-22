@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .models import Question, Choice
+from .models import Question, Choice, Profile, Circle
 from django.template import loader, Context
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -9,7 +9,7 @@ from django.contrib.auth import login,authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from polls.forms import UserSignUp, AdditionInfo
+from polls.forms import UserSignUp, AdditionInfo, ImageForm
 from django.contrib import messages
 import datetime
 
@@ -30,24 +30,35 @@ def index(request):
 @login_required
 def success(request):
     if request.method == 'POST':
-        form = AdditionInfo(request.POST)
+        form = AdditionInfo(request.POST, request.FILES)
         if form.is_valid():
+            # form.save()
             request.user.profile.bio = form.cleaned_data.get('bio')
             request.user.profile.location = form.cleaned_data.get('location')
             request.user.profile.birthdate = form.cleaned_data.get('birthdate')
-            
+            if form.cleaned_data.get('picture') != request.user.profile.picture:
+                request.user.profile.picture = form.cleaned_data.get('picture', '')
+
+            # pic = form.cleaned_data.get('picture')
+            # print(pic)
+            # print(type(pic))
             request.user.save()
             return HttpResponseRedirect(reverse('polls:index'))
-    print(request.user)
-    form = AdditionInfo(initial={'bio': request.user.profile.bio, 'location':request.user.profile.location,'birthdate':request.user.profile.birthdate})
+    
+    # form = AdditionInfo(initial={'bio': request.user.profile.bio, 'location':request.user.profile.location,'birthdate':request.user.profile.birthdate})
+    form = AdditionInfo(instance=Profile.objects.get(user=request.user))
     return render(request, 'polls/success.html', {'form': form})
 
 @login_required
-def view_profile(request):
-    if request.user.profile:
-        return render(request, 'polls/view_profile.html')
-    
-    return HttpResponseRedirect(reverse('polls:success'))
+def view_profile(request, user_id):
+    # if request.user.profile:
+    #     return render(request, 'polls/view_profile.html')
+    # if request.user.id != user_id:
+
+
+    user = User.objects.get(pk=user_id)
+    return render(request, 'polls/view_profile.html', {'user': user})
+    # return HttpResponseRedirect(reverse('polls:success'))
 
 def login_user(request):
     if request.method == 'POST':
@@ -66,7 +77,7 @@ def login_user(request):
             else:
                 print("testsuccess")
                 print(url)
-                return HttpResponseRedirect(reverse('polls:success'))
+                return HttpResponseRedirect(reverse('polls:view_profile', args=(user.id,)))
 
         else:
             print("not logged in")
@@ -109,8 +120,17 @@ def results(request, question_id):
 # class ResultsView(generic.DetailView):
 #     model = Question
 #     template_name = 'polls/results.html'
+
+@login_required
+def add_friend(request, user_id):
+    
+    # request.user.user.send_request(user_id)
+
+    return HttpResponseRedirect(reverse('polls:index'))
+
 def vote(request,question_id):
     if request.POST.get('edit','') == 'Edit':
+        
         return HttpResponseRedirect(reverse('polls:edit', args=(question_id,))) 
     question = get_object_or_404(Question, pk=question_id)
     try:
@@ -182,6 +202,25 @@ def edit(request, question_id):
 
     
     return render(request, 'polls/edit.html', {'question':question})
+
+def image(request):
+    if request.method == 'POST':
+        print('tttt')
+        form = ImageForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            print("valid")
+            form.save()
+   
+    form = ImageForm()
+    return render(request, 'polls/images.html', {'form': form} )
+
+def view_requests(request):
+
+    return render(request, 'polls/friend_request.html')
+
+# @login_required
+# def other_profile(request, user_id):
+
 
 # def test(request):
 #     if request.method == 'POST':

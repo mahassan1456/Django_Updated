@@ -1,17 +1,33 @@
 {% extends 'polls/base.html' %} 
 
 {% block content %} 
+{% if user %}
+<img src="{{ MEDIA_URL }}{{user.profile.picture}}" alt="" width="100" height="100">
+<div class="">
+    <h2><strong> Biography </strong></h2>
+    <p>
+    {{user.profile.bio}}
+    </p>
+</div>
+<div class="">
+    <h2><strong> Location </strong></h2>
+    <p>
+    {{ user.profile.location }}
+    </p>
+</div>
+<div class="">
+    <h2><strong> Birthdate </strong></h2>
+    <p>
+    {{ user.profile.birthdate }}
+    </p>
+</div>
+{% endif %}
 
-<h2><strong>Biography</strong></h2>
-<p>
- {{request.user.profile.bio}}
-</p>
-<h2><strong>Location</strong></h2>
-<p>
- {{ request.user.profile.location }}
-</p>
-<h2><strong>Birthdate</strong></h2>
-<p>
- {{ request.user.profile.birthdate }}
-</p>
+{% if user.id != request.user.id %}
+
+<a href="{% url 'polls:add_friend' user.id %}"> Send Friend Request</a>
+
+{% endif %}
+
+
 {% endblock %}

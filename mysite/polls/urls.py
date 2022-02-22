@@ -15,5 +15,8 @@ urlpatterns = [
     path('signup/', views.sign_up, name='sign_up'),
     path('add_question/', views.add_question, name='add_question'),
     path('<int:question_id>/edit_question/', views.edit, name='edit'),
-    path('view_profile/', views.view_profile, name="view_profile")
+    path('view_profile/<int:user_id>/', views.view_profile, name="view_profile"),
+    path('add_friend/<int:user_id>', views.add_friend, name='add_friend'),
+    path('friend_requests/', views.view_requests, name='view_requests'),
+    # path('profile/<int:user_id>/', views.other_profile, name='other_profile')
 ]

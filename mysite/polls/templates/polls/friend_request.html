@@ -1,0 +1,16 @@
+{% extends 'polls/base.html' %}
+
+{% block content %}
+
+{% for request in request.user.user.requests.all %}
+
+<p>{{ request.username }}</p>
+
+
+{% endfor %}
+
+
+
+
+
+{% endblock %}

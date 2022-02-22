@@ -1,10 +1,11 @@
+from audioop import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django.forms import ModelForm
-from polls.models import Profile
+from polls.models import Profile, Image
 
 
 
@@ -31,9 +32,23 @@ class UserSignUp(UserCreationForm):
 
 
 
-class AdditionInfo(forms.Form):
-    location = forms.CharField()
-    birthdate = forms.DateField(error_messages={'invalid':'Please input date in YYYY-MM-DD format.'} ,input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD', 'class': 'date',}))
-    bio = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'cols':50}))
+class AdditionInfo(ModelForm):
+    # location = forms.CharField()
+    # birthdate = forms.DateField(error_messages={'invalid':'Please input date in YYYY-MM-DD format.'} ,input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD', 'class': 'date',}))
+    # bio = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'cols':50}))
+    
+    
+    class Meta:
+        model = Profile
+        fields = ['location', 'birthdate', 'bio', 'picture']
+
+class ImageForm(ModelForm):
+    
+
+    class Meta:
+        model = Image
+        fields = ['name','image']
+    
+    
     
 

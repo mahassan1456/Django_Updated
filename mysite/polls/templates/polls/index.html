@@ -3,7 +3,7 @@
 {% block content %}
 
     {% if latest_question_list %}
-<div class="container text-center border border-4 border-secondary rounded my-5 py-3">
+<div class="container text-center border border-4 border-secondary rounded-pill my-5 py-3">
     <h2 style="font-size:60px;">Questions by other Users</h2>
     <ul style="list-style-type:none;">
     {% for question in latest_question_list %}
@@ -15,7 +15,7 @@
     {% endfor %}
     </ul>
 </div>
-<div class="container text-center border border-4 border-primary rounded my-5 py-3">
+<div class="container text-center border border-4 border-primary rounded-pill my-5 py-3">
     <h2 style="font-size:60px;">Questions by You!</h2>
     <ul style="list-style-type:none;">
         {% for question in latest_question_list %}
@@ -28,17 +28,17 @@
     {% else %}
     <p>No polls are available.</p>
     {% endif %}
-<div class="container text-center border border-4 border-warning rounded my-5 py-3">
+<div class="container text-center border border-4 border-warning rounded-pill my-5 py-3">
     <h2 style="font-size:60px;">Questions Answered by you!</h2>
     <ul style="list-style-type:none;">
         {% for choice in request.user.choice_set.all %}
             <li>Answered {{ choice.choice_text }} for {{ choice.question.question_text }}</li> 
             <h5>Other Users that answered Similar</h5>
-            <ol>
+            <ol style="list-style-type:none;">
                 {% for user in Users %}
                  {% for choiceN in user.choice_set.all %}
                  {% if choiceN.question.id == choice.question.id and request.user.id != user.id %}
-                <li>{{ user.username }} Answered {{ choiceN.choice_text }} </li>
+                <li><a href="{% url 'polls:view_profile' user.id %}">{{ user.username }} </a> Answered {{ choiceN.choice_text }} </li>
                  {% endif %}
                  {% endfor %}
                 {% endfor %}
