@@ -32,7 +32,7 @@
     <h2 style="font-size:60px;">Questions Answered by you!</h2>
     <ul style="list-style-type:none;">
         {% for choice in request.user.choice_set.all %}
-            <li>Answered {{ choice.choice_text }} for {{ choice.question.question_text }}</li> 
+            <li>Answered {{ choice.choice_text }} for {{ choice.question.question_text }} <a href="{% url 'polls:chart' choice.question.id %}">View Results</a> </li> 
             <h5>Other Users that answered Similar</h5>
             <ol style="list-style-type:none;">
                 {% for user in Users %}

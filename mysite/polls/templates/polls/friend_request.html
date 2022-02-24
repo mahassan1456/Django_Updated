@@ -2,15 +2,36 @@
 
 {% block content %}
 
+<h2>Received Requests</h2>
+
 {% for request in request.user.user.requests.all %}
 
-<p>{{ request.username }}</p>
+<p>{{ request.username }} <a href="{% url 'polls:accept_request' request.id %}" >  Accept Request </a></p> 
 
 
 {% endfor %}
 
+<h2>Sent Requests</h2>
 
+{% for request in request.user.user.sent_requests.all %}
 
+<p>{{ request.username }} </p>
+
+{% endfor %}
+
+<h2>Friends</h2>
+
+{% for request in request.user.user.friends.all %}
+
+<p><a href="{% url 'polls:view_profile' request.id %}"> {{ request.username }} </a>  <span>-------</span> <a href="{% url 'polls:remove_friend' request.id %}" >  Unfriend </a> </p>
+
+{% endfor %}
+<h2>Mutual Friends</h2>
+{% for friend in mutuals %}
+
+<p>You and <a href="{% url  'polls:view_profile' friend.1.id %}">{{ friend.1.username }}</a> are mutual friends with {{ friend.0.username }} </p>
+
+{% endfor %}
 
 
 {% endblock %}

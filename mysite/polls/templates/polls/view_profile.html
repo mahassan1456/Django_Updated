@@ -1,7 +1,18 @@
 {% extends 'polls/base.html' %} 
-
+{% block styles %} 
+    {{ block.super }}
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@1,300&display=swap" rel="stylesheet"> 
+    <style>
+        h1, h2, p  {
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+    </style>  
+{% endblock styles %}
 {% block content %} 
 {% if user %}
+<div class="container text-center">
 <h1><strong> {{user.username}} </strong></h1>
 <img src="{{ MEDIA_URL }}{{user.profile.picture}}" alt="" width="100" height="100">
 <div class="">
@@ -24,9 +35,36 @@
 </div>
 {% endif %}
 
-{% if user.id != request.user.id %}
+{% if user.id != request.user.id and request.user not in user.user.friends.all %}
 
 <a href="{% url 'polls:add_friend' user.id %}"> Send Friend Request</a>
+
+{% endif %}
+
+{% if request.user in user.user.friends.all or request.user.id == user.id %}
+
+{% for comment in user.comments_set.all %}
+
+<p> {% if comment.posted_by == request.user.username %} You {% else %} {{comment.posted_by }} {% endif %} said {{  comment.comment }} on {{comment.post_date }}</p>
+
+{% endfor %}
+
+
+<form action="{% url 'polls:make_comment' user.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        
+        <textarea name="comment" id="commentfor" cols="30" rows="5" placeholder="Make a Comment"></textarea>
+
+    </fieldset>
+    <input type="submit" class="btn btn-primary" value="Comment">
+    <button class="btn btn-primary"><a style="color:white;text-decoration:none" href="{% url 'polls:success' %}">Edit Profile</a></button>
+
+</form>
+</div>
+
+
+
 
 {% endif %}
 

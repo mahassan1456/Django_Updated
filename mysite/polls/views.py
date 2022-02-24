@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .models import Question, Choice, Profile, Circle
+from .models import Question, Choice, Profile, Circle, Comments
 from django.template import loader, Context
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -12,8 +12,40 @@ from django.utils import timezone
 from polls.forms import UserSignUp, AdditionInfo, ImageForm
 from django.contrib import messages
 import datetime
+from django.core.signals import request_finished
+import plotly
 
 
+
+
+
+def chart(request, question_id):
+    labels =[]
+    data = []
+    qset = Choice.objects.filter(question= question_id)
+    for dat in qset:
+        labels.append(dat.choice_text)
+        data.append(dat.votes)
+    
+
+    return render(request, 'polls/chart.html', {
+    'labels': labels,
+    'data': data,
+    'question': Question.objects.get(pk=question_id).question_text
+})
+    
+    # ch = Choice.objects.get(pk=2)
+
+    # return ch.make_chart(request, 1)
+
+def finished(sender, **kwargs):
+    print("testing if request finished")
+    print(sender)
+
+request_finished.connect(finished)
+
+def test123(request):
+    return render(request,'admin/test123.html')
 
 @login_required
 def index(request):
@@ -48,6 +80,14 @@ def success(request):
     # form = AdditionInfo(initial={'bio': request.user.profile.bio, 'location':request.user.profile.location,'birthdate':request.user.profile.birthdate})
     form = AdditionInfo(instance=Profile.objects.get(user=request.user))
     return render(request, 'polls/success.html', {'form': form})
+
+@login_required
+def make_comment(request,user_id):
+    user = User.objects.get(pk=user_id)
+    comment = Comments(user_c=user, comment=request.POST.get('comment'), posted_by=request.user.username)
+    comment.save()
+
+    return render(request, 'polls/view_profile.html', {'user': user})
 
 @login_required
 def view_profile(request, user_id):
@@ -123,18 +163,28 @@ def results(request, question_id):
 
 @login_required
 def add_friend(request, user_id):
-    usee = User.objects.get(pk=user_id)
-    print(usee)
-    friender = User.objects.get(pk=user_id)
-    print(friender)
-    print('dddd',friender.user)
-    friender.user.requests.add(request.user)
-    friender.save()
-    request.user.user.sent_requests.add(friender)
-    request.user.save()
-    # request.user.user.send_request(user_id)
+    # usee = User.objects.get(pk=user_id)
+    # print(usee)
+    # friender = User.objects.get(pk=user_id)
+    # friender.user.requests.add(request.user)
+    # friender.save()
+    # request.user.user.sent_requests.add(friender)
+    # request.user.save()
+
+    request.user.user.send_request(user_id)
 
     return HttpResponseRedirect(reverse('polls:index'))
+
+@login_required
+def accept_request(request, user_id):
+    
+    request.user.user.accept(user_id)
+    return render(request, 'polls/friend_request.html')
+def remove_friend(request,user_id):
+    request.user.user.remove_friend(user_id)
+
+    return render(request, 'polls/friend_request.html')
+
 
 def vote(request,question_id):
     if request.POST.get('edit','') == 'Edit':
@@ -223,8 +273,8 @@ def image(request):
     return render(request, 'polls/images.html', {'form': form} )
 
 def view_requests(request):
-
-    return render(request, 'polls/friend_request.html')
+    mutuals = request.user.user.is_mutual()
+    return render(request, 'polls/friend_request.html', {'mutuals': mutuals})
 
 # @login_required
 # def other_profile(request, user_id):

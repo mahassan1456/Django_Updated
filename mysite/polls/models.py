@@ -7,12 +7,29 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.shortcuts import render
 
 
 
 # Create your models here.
 
 # User
+
+class Comments(models.Model):
+    user_c = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    post_date = models.DateTimeField(default=timezone.now)
+    comment = models.TextField(max_length=500)
+    posted_by = models.TextField(max_length=50, null=True)
+
+    def make_comment(self, user_id):
+        user = User.objects.get(pk=user_id)
+        if self not in Comments.objects.all():
+            user.comments_set.add(self)
+            user.save()
+
+        
+        
+        
 
 class Image(models.Model):
     name = models.CharField(max_length=20,null=True)
@@ -32,20 +49,40 @@ class Circle(models.Model):
     sent_requests = models.ManyToManyField(User, related_name='sent_requests')
 
     def accept(self, account):
+        account = User.objects.get(pk=account)
         if account in self.requests.all():
+            self.requests.remove(account)
+            account.user.sent_requests.remove(self.user)
             if account not in self.friends.all():
                 self.friends.add(account)
+                account.user.friends.add(self.user)
                 self.save()
-    def remove(self,account):
+                account.user.save()
+                
+    def remove_friend(self,account):
+        account = User.objects.get(pk=account)
         if account in self.friends.all():
             self.friends.remove(account)
+            account.user.friends.remove(self.user)
             self.save()
+            account.user.save()
+
     def send_request(self,account):
         friender = User.objects.get(pk=account)
-        friender.user.requests.add(self)
-        friender.save()
-        self.user.sent_requests.add(friender)
-        self.save()
+        if friender not in self.sent_requests.all():
+            friender.user.requests.add(self.user)
+            # friender.save()
+            self.sent_requests.add(friender)
+        # self.save()
+    def is_mutual(self):
+        el = []
+        for friends in self.friends.all():
+            for friend in friends.user.friends.all():
+                if friend not in self.friends.all() and friend != self.user:
+                    el.append((friends, friend))
+        return el
+
+    
 
     
 
@@ -88,6 +125,12 @@ class Question(models.Model):
 
     def __str__(self):
         return self.question_text
+
+@receiver(post_save, sender=Question)
+def pp(sender, **kwargs):
+    print('Question Created')
+    for it in kwargs:
+        print(it,'-',kwargs[it])
     
 
 class Choice(models.Model):
@@ -99,6 +142,21 @@ class Choice(models.Model):
 
     def __str__(self) -> str:
         return self.choice_text
+    def make_chart(self, request, question_id):
+        labels =[]
+        data = []
+        qset = Choice.objects.filter(question= question_id)
+        for dat in qset:
+            labels.append(dat.choice_text)
+            data.append(dat.votes)
+        print(list(zip(labels,data)))
+        
+
+        return render(request, 'polls/chart.html', {
+        'labels': labels,
+        'data': data,
+    })
+
 
 # class Userchoice(models.Model):
 #     pass

@@ -8,6 +8,8 @@ django = "*"
 mysqlclient = "*"
 django-crispy-forms = "*"
 pillow = "*"
+plotly = "*"
+pandas = "*"
 
 [dev-packages]
 
