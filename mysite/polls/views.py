@@ -16,7 +16,11 @@ from django.core.signals import request_finished
 import plotly
 
 
+def finished(sender, **kwargs):
+    print("testing if request finished")
+    print(sender)
 
+request_finished.connect(finished)
 
 
 def chart(request, question_id):
@@ -34,15 +38,6 @@ def chart(request, question_id):
     'question': Question.objects.get(pk=question_id).question_text
 })
     
-    # ch = Choice.objects.get(pk=2)
-
-    # return ch.make_chart(request, 1)
-
-def finished(sender, **kwargs):
-    print("testing if request finished")
-    print(sender)
-
-request_finished.connect(finished)
 
 def test123(request):
     return render(request,'admin/test123.html')
