@@ -22,9 +22,11 @@
 <h2>Friends</h2>
 
 {% for request in request.user.user.friends.all %}
+<span>
+<img style="display:inline;" src="{{MEDIA_URL}}{{request.profile.picture}}" alt="">
 
 <p><a href="{% url 'polls:view_profile' request.id %}"> {{ request.username }} </a>  <span>-------</span> <a href="{% url 'polls:remove_friend' request.id %}" >  Unfriend </a> </p>
-
+</span>
 {% endfor %}
 <h2>Mutual Friends</h2>
 {% for friend in mutuals %}

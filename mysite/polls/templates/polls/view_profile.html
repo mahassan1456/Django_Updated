@@ -37,7 +37,7 @@
 
 {% if user.id != request.user.id and request.user not in user.user.friends.all %}
 
-<a href="{% url 'polls:add_friend' user.id %}"> Send Friend Request</a>
+<button class="btn btn-primary"><a class="text-white" href="{% url 'polls:add_friend' user.id %}"> Send Friend Request</a></button>
 
 {% endif %}
 
@@ -54,7 +54,7 @@
     {% csrf_token %}
     <fieldset>
         
-        <textarea name="comment" id="commentfor" cols="30" rows="5" placeholder="Make a Comment"></textarea>
+        <textarea name="comment" id="commentfor" cols="30" rows="5" placeholder="Make a Comment" required></textarea>
 
     </fieldset>
     <input type="submit" class="btn btn-primary" value="Comment">

@@ -3,8 +3,9 @@
 
 
 {% block content %}
-{% if error_message %}
-<p><strong>{{ error_message }}</strong></p>
+{% if error_messages %}
+{% for error in error_messages % }
+<p><strong>{{ error}}</strong></p>
 {% endif %}
 <section class="vh-100" style="background-color: #eee;">
     <div class="container h-100">

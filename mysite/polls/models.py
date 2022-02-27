@@ -1,19 +1,25 @@
+from atexit import register
 from datetime import datetime
 from distutils.command.upload import upload
+
 from django.db import models
 from django.utils import timezone
 import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.shortcuts import render
+from PIL import Image as IMG
+from django import template
+
 
 
 
 # Create your models here.
 
 # User
+
 
 class Comments(models.Model):
     user_c = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -29,7 +35,6 @@ class Comments(models.Model):
 
         
         
-        
 
 class Image(models.Model):
     name = models.CharField(max_length=20,null=True)
@@ -40,7 +45,39 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=30, blank=True)
     birthdate = models.DateField(null=True)
-    picture = models.ImageField(upload_to='uploads/', null=True, verbose_name="")
+    picture = models.ImageField(upload_to='uploads/', null=True, verbose_name="", blank=True)
+
+    def rs(self):
+        try:
+            img = IMG.open(self.picture.path)
+        except:
+            return
+        else:
+            if img.height > 100 or img.width > 100:
+                max_size=(100,100)                                                                                                                                                                                                                             
+                img.thumbnail(max_size)                                                                                                                                                                                                                        
+                img.save(self.picture.path)
+        
+
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
+        self.rs()
+        
+        
+    
+
+
+
+
+    # def save(self,*args,**kwargs):
+    #     super().save(*args,**kwargs)
+    #     from PIL import Image
+    #     img = Image.open(self.profile.path)
+
+    #     if img.height > 100 or img.width > 100:
+    #         max_size=(100,100)                                                                                                                                                                                                                             
+    #         img.thumbnail(max_size)                                                                                                                                                                                                                        
+    #         img.save(self.image.path)
 
 class Circle(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, related_name='user')
@@ -75,16 +112,16 @@ class Circle(models.Model):
             self.sent_requests.add(friender)
         # self.save()
     def is_mutual(self):
-        el = []
+        mf = []
         for friends in self.friends.all():
             for friend in friends.user.friends.all():
                 if friend not in self.friends.all() and friend != self.user:
-                    el.append((friends, friend))
-        return el
+                    mf.append((friends, friend))
+        return mf
 
-    
+# @receiver(pre_save, sender=User)   
+# def resize(sender,instance,created, **kwargs):
 
-    
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -120,8 +157,8 @@ class Question(models.Model):
             if choice:
                 self.choice_set.create(choice_text=choice, votes=0)
                 self.save()
-
-
+    def c_name(self):
+        return Question.__class__.__name__
 
     def __str__(self):
         return self.question_text

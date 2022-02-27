@@ -23,6 +23,9 @@ admin.site.register(Question, QuestionAdmin)
 
 admin.site.register(Comments)
 
+admin.site.register(Choice)
+
+
 
 
 

@@ -21,6 +21,7 @@ urlpatterns = [
     path('accept_requests/<int:user_id>/', views.accept_request, name='accept_request'),
     path('remove_friend/<int:user_id>/', views.remove_friend, name='remove_friend'),
     path('comments/<int:user_id>/', views.make_comment, name='make_comment'),
-    path('chart/<int:question_id>', view=views.chart, name='chart')
+    path('chart/<int:question_id>', view=views.chart, name='chart'),
+    path('search/', views.UserList.as_view(), name='search'),
     # path('profile/<int:user_id>/', views.other_profile, name='other_profile')
 ]

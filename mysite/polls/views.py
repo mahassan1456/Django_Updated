@@ -1,3 +1,4 @@
+from tempfile import template
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from .models import Question, Choice, Profile, Circle, Comments
 from django.template import loader, Context
@@ -13,8 +14,28 @@ from polls.forms import UserSignUp, AdditionInfo, ImageForm
 from django.contrib import messages
 import datetime
 from django.core.signals import request_finished
-import plotly
+from PIL import Image
+from django.db.models import Q
 
+
+
+# for searching Users
+class UserList(generic.ListView):
+    template_name = 'polls/querylist.html'
+    model = User
+    context_object_name = 'search_list'
+
+    def get_queryset(self):
+        option = self.request.GET.get('option')
+        query = self.request.GET.get('q')
+        if option == 'User':
+            q_list = User.objects.filter(Q(username__icontains = query) | Q(email__icontains = query))
+            
+        else:
+            q_list = Question.objects.filter(Q(question_text__icontains = query) | Q(question_text__icontains = query))
+            
+        
+        return q_list
 
 def finished(sender, **kwargs):
     print("testing if request finished")
@@ -57,23 +78,27 @@ def index(request):
 @login_required
 def success(request):
     if request.method == 'POST':
-        form = AdditionInfo(request.POST, request.FILES)
+        # request.FILES['picture']= request.user.profile.picture if True else ''
+        form = AdditionInfo(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
-            # form.save()
-            request.user.profile.bio = form.cleaned_data.get('bio')
-            request.user.profile.location = form.cleaned_data.get('location')
-            request.user.profile.birthdate = form.cleaned_data.get('birthdate')
-            if form.cleaned_data.get('picture') != request.user.profile.picture:
-                request.user.profile.picture = form.cleaned_data.get('picture', '')
+            form.save()
+            # request.user.profile.rs()
+            
+            # instance = form.save()
+            # instance.user = request.user
+            # instance.save()
+            # # request.user.profile.bio = form.cleaned_data.get('bio')
+            # # request.user.profile.location = form.cleaned_data.get('location')
+            # # request.user.profile.birthdate = form.cleaned_data.get('birthdate')
+            # # if form.cleaned_data.get('picture') != request.user.profile.picture:
+            # #     request.user.profile.picture = form.cleaned_data.get('picture')
 
-            # pic = form.cleaned_data.get('picture')
-            # print(pic)
-            # print(type(pic))
-            request.user.save()
+            # # request.user.save()
             return HttpResponseRedirect(reverse('polls:index'))
     
     # form = AdditionInfo(initial={'bio': request.user.profile.bio, 'location':request.user.profile.location,'birthdate':request.user.profile.birthdate})
-    form = AdditionInfo(instance=Profile.objects.get(user=request.user))
+    form = AdditionInfo(instance=request.user.profile)
+    
     return render(request, 'polls/success.html', {'form': form})
 
 @login_required
@@ -167,17 +192,18 @@ def add_friend(request, user_id):
     # request.user.save()
 
     request.user.user.send_request(user_id)
-
+    messages.success(request,f"You have sent a request to {User.objects.get(pk=user_id).username} ")
     return HttpResponseRedirect(reverse('polls:index'))
 
 @login_required
 def accept_request(request, user_id):
     
     request.user.user.accept(user_id)
+    messages.success(request, f"You are now friends with {User.objects.get(pk=user_id).username}")
     return render(request, 'polls/friend_request.html')
 def remove_friend(request,user_id):
     request.user.user.remove_friend(user_id)
-
+    messages.success(request, f"You are no longer friends with {User.objects.get(pk=user_id).username}")
     return render(request, 'polls/friend_request.html')
 
 
@@ -195,6 +221,13 @@ def vote(request,question_id):
         }
         return render(request, 'polls/details.html', context)
     else:
+        for item in request.user.choice_set.filter(question=choice.question):
+            if choice.question == item.question:
+                item.votes -= 1
+                item.save()
+                request.user.choice_set.remove(item)
+                break
+            
         choice.users.add(request.user)
         choice.save()
         choice.votes += 1
@@ -217,6 +250,11 @@ def sign_up(request):
         else:
             return render(request, 'polls/sign_up.html', context= {'error_message': "Please enter the same unique password"} )
     return render(request, 'polls/sign_up.html' )
+
+def signup2(request):
+    
+    form = UserSignUp()
+    return render(request,'polls/test.html', {'form': form})
 
 
 @login_required
