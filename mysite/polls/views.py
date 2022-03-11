@@ -16,6 +16,13 @@ import datetime
 from django.core.signals import request_finished
 from PIL import Image
 from django.db.models import Q
+from blog.models import Article
+from django.apps import apps
+
+# Another way of getting Models from apps and helps to avoid circular imports
+
+# Article = apps.get_model('blog','Article')
+
 
 
 
@@ -61,7 +68,8 @@ def chart(request, question_id):
     
 
 def test123(request):
-    return render(request,'admin/test123.html')
+    articles = Article.objects.all()
+    return render(request,'admin/test123.html',context={'articles':articles})
 
 @login_required
 def index(request):
@@ -122,25 +130,25 @@ def view_profile(request, user_id):
 
 def login_user(request):
     if request.method == 'POST':
-        print("post")
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request,username=username,password=password)
         url = request.GET.get('next', '')
-        print("url----", url, "user----", user)
         if user is not None:
             login(request, user)
-            # return HttpResponseRedirect(reverse('polls:success'))
-            if url:
-                print(url)
-                return HttpResponseRedirect(url)
-            else:
-                print("testsuccess")
-                print(url)
-                return HttpResponseRedirect(reverse('polls:view_profile', args=(user.id,)))
+            return HttpResponseRedirect(url if url else reverse('polls:view_profile', args=(user.id,)))
+            # # return HttpResponseRedirect(reverse('polls:success'))
+            # if url:
+            #     print(url)
+            #     return HttpResponseRedirect(url)
+            # else:
+            #     print("testsuccess")
+            #     print(url)
+            #     return HttpResponseRedirect(reverse('polls:view_profile', args=(user.id,)))
 
         else:
-            print("not logged in")
+            messages.success(request, "Username or Password is Incorrect")
+            return HttpResponseRedirect(reverse('polls:login_user'))
     
     
     return render(request, 'polls/login.html', context={})
@@ -163,23 +171,6 @@ def detail(request, question_id):
 def results(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/results.html', {'question': question})
-# class IndexView(generic.ListView):
-#     template_name = 'polls/index.html'
-#     context_object_name = 'latest_question_list'
-
-#     def get_queryset(self):
-#         """Return the last five published questions."""
-#         return Question.objects.order_by('-pub_date')[:5]
-
-
-# class DetailView(generic.DetailView):
-#     model = Question
-#     template_name = 'polls/details.html'
-
-
-# class ResultsView(generic.DetailView):
-#     model = Question
-#     template_name = 'polls/results.html'
 
 @login_required
 def add_friend(request, user_id):
@@ -251,10 +242,10 @@ def sign_up(request):
             return render(request, 'polls/sign_up.html', context= {'error_message': "Please enter the same unique password"} )
     return render(request, 'polls/sign_up.html' )
 
-def signup2(request):
+# def signup2(request):
     
-    form = UserSignUp()
-    return render(request,'polls/test.html', {'form': form})
+#     form = UserSignUp()
+#     return render(request,'polls/test.html', {'form': form})
 
 
 @login_required
@@ -278,32 +269,33 @@ def add_question(request):
 def edit(request, question_id):
     question = request.user.question_set.get(pk=question_id)
     if request.method == 'POST':
-        # question.choice_set.all().delete()
-        # question.question_text = request.POST.get('question')
-        # question.save()
-        # choices = request.POST.get('choices','')
-        # choices_list = [x.strip() for x in choices.split('\n')]
         question.deleteChoices(request.POST.get('question'), request.POST.get('choices',''))
-        # for x in choices_list:
-        #     question.choice_set.create(choice_text=x, votes=0)
-        #     question.save()
         return HttpResponseRedirect(reverse('polls:index'))
 
 
 
     
     return render(request, 'polls/edit.html', {'question':question})
-
-def image(request):
+@login_required
+def profile_settings(request):
     if request.method == 'POST':
-        print('tttt')
-        form = ImageForm(request.POST or None, request.FILES or None)
-        if form.is_valid():
-            print("valid")
-            form.save()
+        answer = request.POST.get('answer','')
+        request.user.profile.canView = answer
+        request.user.save()
+        return HttpResponseRedirect(reverse('polls:view_profile', args=(request.user.id,)))
+    return render(request,'polls/profile_settings.html')
+
+
+# def image(request):
+#     if request.method == 'POST':
+#         print('tttt')
+#         form = ImageForm(request.POST or None, request.FILES or None)
+#         if form.is_valid():
+#             print("valid")
+#             form.save()
    
-    form = ImageForm()
-    return render(request, 'polls/images.html', {'form': form} )
+#     form = ImageForm()
+#     return render(request, 'polls/images.html', {'form': form} )
 
 def view_requests(request):
     mutuals = request.user.user.is_mutual()

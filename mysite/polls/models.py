@@ -46,6 +46,7 @@ class Profile(models.Model):
     location = models.CharField(max_length=30, blank=True)
     birthdate = models.DateField(null=True)
     picture = models.ImageField(upload_to='uploads/', null=True, verbose_name="", blank=True)
+    canView = models.CharField(max_length=3, default='No')
 
     def rs(self):
         try:

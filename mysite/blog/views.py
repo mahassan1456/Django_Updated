@@ -10,11 +10,13 @@ from django.urls import reverse
 from PIL import Image
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # Create your views here.
 
-class MakePost(CreateView):
+class MakePost(LoginRequiredMixin, CreateView):
     template_name = 'blog/create.html'
     form_class = ArticleForm
     success_url = '/blog/'
@@ -22,15 +24,6 @@ class MakePost(CreateView):
     def form_valid(self,form):
         form.instance.author = self.request.user
         form.instance.slug = '-'.join(form.instance.title.split(' ')).lower()
-        # try:
-        #     img = Image.open(form.instance.image.path)
-        # except:
-        #     print('exception')
-        # else:
-        #     if img.height > 500 or img.width > 500:
-        #         max_size=(100,100)                                                                                                                                                                                                                             
-        #         img.thumbnail(max_size)                                                                                                                                                                                                                        
-        #         img.save(form.instance.image.path)
         
         return super().form_valid(form)
 
@@ -63,7 +56,7 @@ class AllPosts(ListView):
     queryset = Article.objects.all()
     paginate_by = 2
 
-class ArticleView(DetailView):
+class ArticleView(LoginRequiredMixin, DetailView):
     model = Article
     template_name = 'blog/articles.html'
 
@@ -90,6 +83,11 @@ def post_comment(request, article_id):
         reply.save()
 
     return HttpResponseRedirect(reverse('blog:article', args=(article.id, article.slug)))
+
+def test(request):
+
+    return render(request, 'blog/flex.html')
+
 
 
 

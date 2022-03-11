@@ -18,6 +18,7 @@ class Article(models.Model):
     content = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    extra = models.CharField(max_length=30,null=True,blank=True)
     tags = models.ManyToManyField(Tags, blank=True)
 
     # def get_absolute_url(self):

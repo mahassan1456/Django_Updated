@@ -23,5 +23,6 @@ urlpatterns = [
     path('comments/<int:user_id>/', views.make_comment, name='make_comment'),
     path('chart/<int:question_id>', view=views.chart, name='chart'),
     path('search/', views.UserList.as_view(), name='search'),
-    # path('profile/<int:user_id>/', views.other_profile, name='other_profile')
+    path('profile_settings/', view=views.profile_settings, name='profile_settings'),
+    path('test123/', views.test123, name='test123')
 ]

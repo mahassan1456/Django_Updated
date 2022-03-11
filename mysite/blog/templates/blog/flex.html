@@ -1,15 +1,25 @@
+{% load static %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'blog/blogstyles.css' %}">
     <title>Document</title>
 </head>
 <body>
-    <p>Testing HTML</p>
-    {% for art in articles %}
-        <p>{{ art.content }}</p>
-    {% endfor %}
+    <div class="container">
+        <p id="A">A</p>
+        <p id="B">B</p>
+        <p id="C">C</p>
+        <p id="D">D</p>
+
+    </div>
+
+   
+    
 </body>
 </html>
