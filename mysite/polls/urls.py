@@ -20,6 +20,7 @@ urlpatterns = [
     path('friend_requests/', views.view_requests, name='view_requests'),
     path('accept_requests/<int:user_id>/', views.accept_request, name='accept_request'),
     path('remove_friend/<int:user_id>/', views.remove_friend, name='remove_friend'),
+    path('cancel_request/<int:user_id>/', views.cancel_request, name='cancel_request'),
     path('comments/<int:user_id>/', views.make_comment, name='make_comment'),
     path('chart/<int:question_id>', view=views.chart, name='chart'),
     path('search/', views.UserList.as_view(), name='search'),

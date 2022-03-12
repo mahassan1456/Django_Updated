@@ -86,6 +86,13 @@ class Circle(models.Model):
     requests = models.ManyToManyField(User, related_name='requests')
     sent_requests = models.ManyToManyField(User, related_name='sent_requests')
 
+    def unrequest(self, user_id):
+        account = User.objects.get(pk=user_id)
+        self.sent_requests.remove(account)
+        account.user.requests.remove(self.user)
+        self.save()
+        account.save()
+
     def accept(self, account):
         account = User.objects.get(pk=account)
         if account in self.requests.all():

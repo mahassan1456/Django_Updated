@@ -13,9 +13,9 @@
 
 <h2>Sent Requests</h2>
 
-{% for request in request.user.user.sent_requests.all %}
+{% for req in request.user.user.sent_requests.all %}
 
-<p>{{ request.username }} </p>
+<p>{{ req.username }} <a href="{% url 'polls:cancel_request' req.id %}" >  Cancel Request </a> </p>
 
 {% endfor %}
 

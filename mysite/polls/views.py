@@ -185,6 +185,11 @@ def add_friend(request, user_id):
     request.user.user.send_request(user_id)
     messages.success(request,f"You have sent a request to {User.objects.get(pk=user_id).username} ")
     return HttpResponseRedirect(reverse('polls:index'))
+    
+@login_required
+def cancel_request(request, user_id):
+    request.user.user.unrequest(user_id)
+    return render(request, 'polls/friend_request.html')
 
 @login_required
 def accept_request(request, user_id):
