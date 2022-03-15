@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
-from mysite.secrets import DB_PASS, DB_USER, DB_NAME
+# from mysite.secrets import DB_PASS, DB_USER, DB_NAME
 
 
 
@@ -88,16 +88,27 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         # 'ENGINE': 'django.db.backends.sqlite3',
+#         # 'NAME': BASE_DIR / 'db.sqlite3'
+#         'ENGINE' : 'django.db.backends.mysql',
+#         'NAME': DB_NAME,
+#         'HOST': '127.0.0.1',
+#         'USER': DB_USER,
+#         'PASSWORD': DB_PASS,
+#         'PORT': '3306'
+#     }
+# }
+
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3'
-        'ENGINE' : 'django.db.backends.mysql',
-        'NAME': DB_NAME,
-        'HOST': '127.0.0.1',
-        'USER': DB_USER,
-        'PASSWORD': DB_PASS,
-        'PORT': '3306'
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
@@ -146,7 +157,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-STATICFILES_DIRS = [
-    'polls/static/polls/',
-    'blog/static/blog'
-]
+# STATICFILES_DIRS = [
+#     'polls/static/polls/',
+#     'blog/static/blog'
+# ]
