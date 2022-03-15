@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-twh+4c!45g6b8+sc+%li%d25$ihkmp82nx(q)a01si%=m^b$#%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0','10.0.0.123']
+ALLOWED_HOSTS = ['0.0.0.0','10.0.0.123', '127.0.0.1']
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -94,7 +94,8 @@ DATABASES = {
         # 'NAME': BASE_DIR / 'db.sqlite3'
         'ENGINE' : 'django.db.backends.mysql',
         'NAME': DB_NAME,
-        'HOST': '127.0.0.1',
+        # 'HOST': '127.0.0.1',
+        'HOST': 'db',
         'USER': DB_USER,
         'PASSWORD': DB_PASS,
         'PORT': '3306'
@@ -146,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-STATICFILES_DIRS = [
-    'polls/static/polls/',
-    'blog/static/blog'
-]
+# STATICFILES_DIRS = [
+#     'polls/static/polls/',
+#     'blog/static/blog'
+# ]
